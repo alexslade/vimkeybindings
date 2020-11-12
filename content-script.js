@@ -4,65 +4,30 @@ const SCROLL_LINE_COUNT = 1;
 const SCROLL_HORIZONTAL_PIXELS = 5;
 
 const actions = [
-  { keyCombination: 'h', command: 'cmd_scrollLeft' },
   { keyCombination: 'j', command: 'cmd_scrollLineDown' },
   { keyCombination: 'k', command: 'cmd_scrollLineUp' },
-  { keyCombination: 'l', command: 'cmd_scrollRight' },
   { keyCombination: 'G', command: 'cmd_scrollFileBottom' },
   { keyCombination: 'gg', command: 'cmd_scrollFileTop' },
-  { keyCombination: 'gt', command: 'cmd_activateNextTab' },
-  { keyCombination: 'gT', command: 'cmd_activatePreviousTab' },
-  /*
-  {keyCombination: 'H', command: 'cmd_scrollScreenTop'},
-  {keyCombination: 'M', command: 'cmd_scrollScreenMiddle'},
-  {keyCombination: 'L', command: 'cmd_scrollScreenBottom'},
-  */
 ];
 
 const commands = {
-  cmd_scrollLeft: function(repetition) {
-    const repeat = repetition == "" ? 1 : +repetition;
-
-    document.body.scrollLeft -= SCROLL_HORIZONTAL_PIXELS * repeat;
+  cmd_scrollLineDown: function() {
+    window.scrollBy({
+      left: 0,
+      top: 400,
+      behavior: 'smooth'
+    })
   },
-  cmd_scrollRight: function(repetition) {
-    const repeat = repetition == "" ? 1 : +repetition;
-
-    document.body.scrollLeft += SCROLL_HORIZONTAL_PIXELS * repeat;
-  },
-  cmd_scrollLineDown: function(repetition) {
-    const repeat = repetition == "" ? 1 : +repetition;
-
-    window.scrollByLines(SCROLL_LINE_COUNT * repeat);
-  },
-  cmd_scrollLineUp: function(repetition) {
-    const repeat = repetition == "" ? 1 : +repetition;
-
-    window.scrollByLines(-SCROLL_LINE_COUNT * repeat);
-  },
-  cmd_scrollFileBottom: function() {
-    window.scrollTo(window.scrollX, document.body.scrollHeight);
+  cmd_scrollLineUp: function() {
+    window.scrollBy({
+      left: 0,
+      top: -400,
+      behavior: 'smooth'
+    })
   },
   cmd_scrollFileTop: function() {
     window.scrollTo(window.scrollX, 0);
   },
-  cmd_activateNextTab: function (repetition) {
-    browser.runtime.sendMessage({
-      message: {
-        to: 'background',
-        command: 'activateNextTab',
-        repetition,
-      }
-    });
-  },
-  cmd_activatePreviousTab: function (repetition) {
-    browser.runtime.sendMessage({
-      message: {
-        command: 'activatePreviousTab',
-        repetition,
-      }
-    });
-  }
 };
 
 //Store the longest action combination's length as the max length
@@ -93,7 +58,7 @@ function resetHistory() {
 }
 
 /**
- * Runs an action 
+ * Runs an action
  * @param {VimBindings~action} action
  */
 function runAction(action) {
@@ -119,7 +84,7 @@ document.addEventListener("keypress", event => {
 
   // see if the key combination matches one of our vim command combinations
   const action = actions.find(value => value.keyCombination == keyCombination);
-  
+
   // bail if not supported action
   if (!action) {
     //If the combination length is reached the max length, there are no possible actions left.
